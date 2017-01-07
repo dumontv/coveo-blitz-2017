@@ -31,7 +31,7 @@ namespace CoveoBlitz.RandomBot
         {
             
 
-            string direction = this.api.GetDirection(state.myHero.pos, new Pos { x = 9, y = 9});
+            string direction = this.api.GetDirection(state.myHero.pos, GetTilePosOnMap.GetClosestTile(state.board, state.myHero.pos, new Tile[] { Tile.BURGER_NEUTRAL }));
 
             //switch (random.Next(0, 5))
             //{
