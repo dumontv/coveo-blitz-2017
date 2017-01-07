@@ -4,21 +4,18 @@ using System.Collections.Generic;
 
 namespace Coveo.Bot
 {
-    public static class GetTilePosOnMap
+    public class GetTilePosOnMap
     {
+        private List<Pos> _targets = new List<Pos>();
 
-        private static List<Pos> _targets = new List<Pos>();
-
-        public static Pos GetClosestTile(Tile[][] board, Pos startingPos, Tile[] type)
+        public Pos GetClosestTile(Tile[][] board, Pos startingPos, Tile[] type)
         {
             for (int x = 0; x < board.Length; ++x)
             {
                 for (int y = 0; y < board[x].Length; ++y)
                 {
-                    Console.WriteLine("{0}, {1}", x, y);
                     foreach (Tile tile in type)
                     {
-                        Console.WriteLine("{0}, {1}", x, y);
                         if (board[x][y] == tile)
                         {
                             _targets.Add(new Pos() { x = y, y = x });
@@ -30,15 +27,18 @@ namespace Coveo.Bot
             return FindClosestTilePos(startingPos);
         }
 
-        private static Pos FindClosestTilePos(Pos startingPos)
+        private Pos FindClosestTilePos(Pos startingPos)
         {
             int currDistance = int.MaxValue;
             Pos closestTile = new Pos() { x = 0, y = 0 };
 
-            foreach ( Pos tile in _targets)
+            foreach (Pos tile in _targets)
             {
-                if (((startingPos.x - tile.x) * (startingPos.x - tile.x)) + ((startingPos.y - tile.y) * (startingPos.y - tile.y))  < currDistance)
+                int distance = Math.Abs((tile.x - startingPos.x) * (tile.x - startingPos.x)) + ((tile.y - startingPos.y) * (tile.y - startingPos.y));
+                Console.WriteLine(distance.ToString());
+                if (distance < currDistance)
                 {
+                    currDistance = distance;
                     closestTile = tile;
                 }
             }
