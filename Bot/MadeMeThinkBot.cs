@@ -1,111 +1,102 @@
 ﻿using CoveoBlitz;
-using System;
 
 namespace Coveo.Bot
 {
     public class MadeMeThinkBot : ISimpleBot
     {
-        private Tile _target;
+        private Pos _target;
+        
+        private bool _needFirstFind;
 
-        private bool _targetingCustomer;
-        private bool _targetingFood; 
+        private Pos _registeredCustomer;
 
-        private StateMachine _botState;
+        private int _lastBurgerCount = 0;
+        private int _lastFriesCount = 0;
 
-        private int _currentCustomerId;
+        private Pos TryCompleteCommand(GameState state)
+        {
+            Pos customerPosition = new Pos() {x = -1, y = -1};
+            for (int i = 0; i < state.customers.Count; i++)
+            {
+                if (state.customers[i].burger <= state.myHero.burgerCount &&
+                    state.customers[i].frenchFries <= state.myHero.frenchFriesCount)
+                {
+                    switch (state.customers[i].id)
+                    {
+                        case 1:
+                            return GetPositionInMap(state.board, Tile.CUSTOMER_1);
+                        case 2:
+                            return GetPositionInMap(state.board, Tile.CUSTOMER_2);
+                        case 3:
+                            return GetPositionInMap(state.board, Tile.CUSTOMER_3);
+                        case 4:
+                            return GetPositionInMap(state.board, Tile.CUSTOMER_4);
+                    }
+                }
+            }
+            return customerPosition;
+        }
 
         public override string Move(GameState state)
         {
-            if (_botState.GetType() == typeof(ChasingState)) 
+            if (!_needFirstFind)
             {
-                Pos myPos = state.myHero.pos;
-                Tile[] _adjacentTiles = new Tile[4];
-                _adjacentTiles[0] = state.board[myPos.x][myPos.y - 1]; //Top
-                _adjacentTiles[1] = state.board[myPos.x - 1][myPos.y]; //Left
-                _adjacentTiles[2] = state.board[myPos.x][myPos.y + 1]; //Bottom
-                _adjacentTiles[3] = state.board[myPos.x + 1][myPos.y]; //Right
-
-                if (_targetingCustomer) 
+                if (_lastBurgerCount != state.myHero.burgerCount ||
+                    _lastFriesCount != state.myHero.frenchFriesCount)
                 {
-                    for (int i = 0; i < _adjacentTiles.Length; i++) 
+                    Pos position = TryCompleteCommand(state);
+                    if (position.x != -1 && position.y != -1)
                     {
-                        if (_adjacentTiles[i] == Tile.CUSTOMER_1)
-                        {
-                            _target = Tile.CUSTOMER_1;
-                        }
-                        else if (_adjacentTiles[i] == Tile.CUSTOMER_2) 
-                        {
-                            _target = Tile.CUSTOMER_2;
-                        }
-                        else if (_adjacentTiles[i] == Tile.CUSTOMER_3) 
-                        {
-                            _target = Tile.CUSTOMER_3;
-                        }
-                        else if (_adjacentTiles[i] == Tile.CUSTOMER_4)
-                        {
-                            _target = Tile.CUSTOMER_4;
-                        }
-                        _botState = new ChasingState(_target);
+                        _target = GetTilePosOnMap.GetClosestTile(state.board, state.myHero.pos,
+                            new[]
+                            {
+                                Tile.BURGER_1, Tile.BURGER_2, Tile.BURGER_3, Tile.BURGER_4, Tile.FRIES_1, Tile.FRIES_2,
+                                Tile.FRIES_3, Tile.FRIES_4
+                            });
                     }
-                } 
-                else if (_targetingFood)
-                {
-
+                    else
+                    {
+                        _target = position;
+                    }
                 }
             }
-            else if (_botState.GetType() == typeof(HealingState)) 
+            else
             {
-
+                _target = GetTilePosOnMap.GetClosestTile(state.board, state.myHero.pos,
+                    new[] { Tile.BURGER_1, Tile.BURGER_2, Tile.BURGER_3, Tile.BURGER_4, Tile.FRIES_1, Tile.FRIES_2, Tile.FRIES_3, Tile.FRIES_4 });
+                _needFirstFind = false;
             }
-            else if (_botState.GetType() == typeof(DeliveringState)) 
-            {
-
-            }
-
-            Customer myCustomer = state.customers[_currentCustomerId];
-            if (_botState.GetType() == typeof(ChasingState) && 
-                state.myHero.life <= 30) 
-            {
-                //SET THE TARGET TO A COKE
-                _botState = new HealingState(_target);
-            }
-
-            if (_botState.GetType() == typeof(ChasingState) &&
-                state.myHero.burgerCount == myCustomer.burger &&
-                state.myHero.frenchFriesCount == myCustomer.frenchFries) 
-            {
-                switch (_currentCustomerId) 
-                {
-                    case 1:
-                        _target = Tile.CUSTOMER_1;
-                        break;
-                    case 2:
-                        _target = Tile.CUSTOMER_2;
-                        break;
-                    case 3:
-                        _target = Tile.CUSTOMER_3;
-                        break;
-                    case 4:
-                        _target = Tile.CUSTOMER_4;
-                        break;
-                }
-                _botState = new DeliveringState(_target);
-            }
-
-            
-
-            return _botState.Act(state);   
+            return api.GetDirection(state.myHero.pos, _target);
         }
 
         public override void Setup()
         {
-            //RETOURNER LE PLUS PROCHE CUSTOMER
-            _botState = new ChasingState(Tile.CUSTOMER_1);
+            _target = new Pos() {x = 0, y = 0 };
+            _registeredCustomer = new Pos() {x = 0, y = 0};
+            _needFirstFind = true;
         }
 
         public override void Shutdown()
         {
-            throw new NotImplementedException();
+            _target = null;
+            _registeredCustomer = null;
+        }
+
+        private Pos GetPositionInMap(Tile[][] map, Tile tile) 
+        {
+            Pos pos = new Pos() {x = -1, y = -1};
+            for (int i = 0; i < map.Length; i++) 
+            {
+                for (int j = 0; j < map[i].Length; j++)
+                {
+                    if (map[j][i] == tile) {
+                        pos.x = j;
+                        pos.y = i;
+                        return pos;
+                    }
+                }
+            }
+            return pos;
         }
     }
 }
