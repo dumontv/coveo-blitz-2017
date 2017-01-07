@@ -70,13 +70,6 @@ namespace CoveoBlitz
                 }
 
                 Console.WriteLine(exception.Message);
-                if (exception.Response != null)
-                {
-                    using (var reader = new StreamReader(exception.Response.GetResponseStream()))
-                    {
-                        Console.WriteLine(reader.ReadToEnd());
-                    }
-                }
 
                 return MadeMeThinkBot.LastDir;
             }
@@ -89,7 +82,7 @@ namespace CoveoBlitz
 
             DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(DirectionResponse));
             DirectionResponse directionResponse = (DirectionResponse)ser.ReadObject(stream);
-            return directionResponse.direction;
+            return directionResponse.direction != "" ? directionResponse.direction : MadeMeThinkBot.LastDir;
         }
 
         //initializes a new game, its syncronised
@@ -148,11 +141,8 @@ namespace CoveoBlitz
                     string result = client.UploadString(playURL, myParameters);
                     this.gameState = Deserialize(result);
                 } catch (WebException exception) {
-                    using (var reader = new StreamReader(exception.Response.GetResponseStream())) {
-                        errored = true;
-                        Console.WriteLine(exception.Message);
-                        Console.WriteLine(reader.ReadToEnd());
-                    }
+                    Console.WriteLine(exception.Message);
+                    errored = true;
                 }
             }
         }

@@ -39,9 +39,16 @@ namespace Coveo.Bot
             Tile.CUSTOMER_4
         };
 
+        private static Tile[] _tavern = new Tile[] {
+            Tile.TAVERN
+        };
+
         private Tile[] _tilesToSearch;
 
         public static string LastDir = Direction.Stay;
+
+        private Customer closestCustomer = null;
+        private int lastFulfilled;
 
         private Pos TryCompleteCommand(GameState state)
         {
@@ -60,7 +67,7 @@ namespace Coveo.Bot
         }
 
         public override string Move(GameState state)
-        {
+        {            
             int burgerRequirements = 0;
             int fryRequirements = 0;
             state.customers.ForEach(c => {
@@ -68,11 +75,11 @@ namespace Coveo.Bot
                 fryRequirements += c.frenchFries;
             });            
 
-            if (burgerRequirements == 0 && fryRequirements != 0)
+            if (burgerRequirements != 0 && fryRequirements == 0)
             {
                 _tilesToSearch = _burgerTiles[state.myHero.id - 1];
             }
-            else if (fryRequirements == 0 && burgerRequirements != 0)
+            else if (fryRequirements != 0 && burgerRequirements == 0)
             {
                 _tilesToSearch = _fryTiles[state.myHero.id - 1];
             }
@@ -86,7 +93,7 @@ namespace Coveo.Bot
             {
                 _target = GetTilePosOnMap.GetClosestTile(state.board, state.myHero.pos, _tilesToSearch);
             }
-            else if (_lastBurgerCount != state.myHero.burgerCount || _lastFriesCount != state.myHero.frenchFriesCount)
+            else
             {
                 Pos position = TryCompleteCommand(state);
                 if (position != null)
