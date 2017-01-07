@@ -76,8 +76,7 @@ namespace CoveoBlitz
                         Console.WriteLine(reader.ReadToEnd());
                     }
                 }                
-
-                Console.WriteLine("Server Error, staying.");
+                
                 return Direction.Stay;
             }
         }
@@ -139,7 +138,7 @@ namespace CoveoBlitz
 
         public void MoveHero(string direction)
         {
-            Console.WriteLine("Going {0}\n", direction);
+            //Console.WriteLine("Going {0}\n", direction);
             string myParameters = "key=" + botKey + "&dir=" + direction;
 
             using (WebClient client = new WebClient()) {

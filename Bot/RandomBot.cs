@@ -1,7 +1,9 @@
 ﻿// Copyright (c) 2005-2016, Coveo Solutions Inc.
 
 using Coveo.Bot;
+using CoveoBlitz;
 using System;
+using System.Collections.Generic;
 
 namespace CoveoBlitz.RandomBot
 {
@@ -15,6 +17,15 @@ namespace CoveoBlitz.RandomBot
         private readonly Random random = new Random();
 
         private GetTilePosOnMap _getTilePos = new GetTilePosOnMap();
+
+        Pos nextPos = null;
+
+        private static Tile[][] _tiles = new Tile[][] {
+            new Tile[] { Tile.BURGER_2, Tile.FRIES_2, Tile.BURGER_3, Tile.FRIES_3, Tile.BURGER_4, Tile.FRIES_4, Tile.BURGER_NEUTRAL, Tile.FRIES_NEUTRAL },
+            new Tile[] { Tile.BURGER_1, Tile.FRIES_1, Tile.BURGER_3, Tile.FRIES_3, Tile.BURGER_4, Tile.FRIES_4, Tile.BURGER_NEUTRAL, Tile.FRIES_NEUTRAL },
+            new Tile[] { Tile.BURGER_1, Tile.FRIES_1, Tile.BURGER_2, Tile.FRIES_2, Tile.BURGER_4, Tile.FRIES_4, Tile.BURGER_NEUTRAL, Tile.FRIES_NEUTRAL },
+            new Tile[] { Tile.BURGER_1, Tile.FRIES_1, Tile.BURGER_2, Tile.FRIES_2, Tile.BURGER_3, Tile.FRIES_3, Tile.BURGER_NEUTRAL, Tile.FRIES_NEUTRAL }
+        };
 
         /// <summary>
         /// This will be run before the game starts
@@ -31,31 +42,10 @@ namespace CoveoBlitz.RandomBot
         /// <returns></returns>
         public override string Move(GameState state)
         {
-            
-
-            string direction = this.api.GetDirection(state.myHero.pos, GetTilePosOnMap.GetClosestTile(state.board, state.myHero.pos, new Tile[] { Tile.BURGER_NEUTRAL, Tile.FRIES_NEUTRAL }));
-            //switch (random.Next(0, 5))
-            //{
-            //    case 0:
-            //        direction = Direction.East;
-            //        break;
-
-            //    case 1:
-            //        direction = Direction.West;
-            //        break;
-
-            //    case 2:
-            //        direction = Direction.North;
-            //        break;
-
-            //    case 3:
-            //        direction = Direction.South;
-            //        break;
-
-            //    default:
-            //        direction = Direction.Stay;
-            //        break;
-            //}
+            Console.WriteLine(state.board[nextPos.y][nextPos.x]);
+            List<Tile> tilesToSearch = new List<Tile>();
+            tilesToSearch.AddRange(_tiles[state.myHero.id - 1]);
+            string direction = this.api.GetDirection(state.myHero.pos, GetTilePosOnMap.GetClosestTile(state.board, state.myHero.pos, tilesToSearch));
 
             Console.WriteLine("Completed turn {0}, going {1}", state.currentTurn, direction);
             return direction;

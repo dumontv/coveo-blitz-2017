@@ -1,37 +1,56 @@
 ﻿using CoveoBlitz;
+using System;
+using System.Collections.Generic;
 
 namespace Coveo.Bot
 {
     public class MadeMeThinkBot : ISimpleBot
     {
-        private Pos _target;
-        
-        private bool _needFirstFind;
-
-        private Pos _registeredCustomer;
+        private Pos _target = null;
 
         private int _lastBurgerCount = 0;
         private int _lastFriesCount = 0;
 
+        private static Tile[][] _tiles = new Tile[][] {
+            new Tile[] { Tile.BURGER_2, Tile.FRIES_2, Tile.BURGER_3, Tile.FRIES_3, Tile.BURGER_4, Tile.FRIES_4, Tile.BURGER_NEUTRAL, Tile.FRIES_NEUTRAL },
+            new Tile[] { Tile.BURGER_1, Tile.FRIES_1, Tile.BURGER_3, Tile.FRIES_3, Tile.BURGER_4, Tile.FRIES_4, Tile.BURGER_NEUTRAL, Tile.FRIES_NEUTRAL },
+            new Tile[] { Tile.BURGER_1, Tile.FRIES_1, Tile.BURGER_2, Tile.FRIES_2, Tile.BURGER_4, Tile.FRIES_4, Tile.BURGER_NEUTRAL, Tile.FRIES_NEUTRAL },
+            new Tile[] { Tile.BURGER_1, Tile.FRIES_1, Tile.BURGER_2, Tile.FRIES_2, Tile.BURGER_3, Tile.FRIES_3, Tile.BURGER_NEUTRAL, Tile.FRIES_NEUTRAL }
+        };
+
+        private static Tile[][] _burgerTiles = new Tile[][] {
+            new Tile[] { Tile.BURGER_2, Tile.BURGER_3, Tile.BURGER_4, Tile.BURGER_NEUTRAL },
+            new Tile[] { Tile.BURGER_1, Tile.BURGER_3, Tile.BURGER_4, Tile.BURGER_NEUTRAL },
+            new Tile[] { Tile.BURGER_1, Tile.BURGER_2, Tile.BURGER_4, Tile.BURGER_NEUTRAL },
+            new Tile[] { Tile.BURGER_1, Tile.BURGER_2, Tile.BURGER_3, Tile.BURGER_NEUTRAL }
+        };
+
+        private static Tile[][] _fryTiles = new Tile[][] {
+            new Tile[] { Tile.FRIES_2, Tile.FRIES_3, Tile.FRIES_4, Tile.FRIES_NEUTRAL },
+            new Tile[] { Tile.FRIES_1, Tile.FRIES_3, Tile.FRIES_4, Tile.FRIES_NEUTRAL },
+            new Tile[] { Tile.FRIES_1, Tile.FRIES_2, Tile.FRIES_4, Tile.FRIES_NEUTRAL },
+            new Tile[] { Tile.FRIES_1, Tile.FRIES_2, Tile.FRIES_3, Tile.FRIES_NEUTRAL }
+        };
+
+        private static Tile[] _customers = new Tile[] {
+            Tile.CUSTOMER_1,
+            Tile.CUSTOMER_2,
+            Tile.CUSTOMER_3,
+            Tile.CUSTOMER_4
+        };
+
         private Pos TryCompleteCommand(GameState state)
         {
-            Pos customerPosition = new Pos() {x = -1, y = -1};
-            for (int i = 0; i < state.customers.Count; i++)
+            Pos customerPosition = null;
+            //Console.WriteLine(state.customers.Count);
+
+            state.customers.Sort((Customer c1, Customer c2) => GetTilePosOnMap.DistanceBetweenPos(state.myHero.pos, GetTilePosOnMap.GetClosestTile(state.board, state.myHero.pos, new List<Tile>() { _customers[c1.id - 1] })).CompareTo(GetTilePosOnMap.DistanceBetweenPos(state.myHero.pos, GetTilePosOnMap.GetClosestTile(state.board, state.myHero.pos, new List<Tile>() { _customers[c2.id - 1] }))));
+
+            for (int i = 0; i < state.customers.Count; ++i)
             {
-                if (state.customers[i].burger <= state.myHero.burgerCount &&
-                    state.customers[i].frenchFries <= state.myHero.frenchFriesCount)
+                if (state.customers[i].burger <= state.myHero.burgerCount && state.customers[i].frenchFries <= state.myHero.frenchFriesCount)
                 {
-                    switch (state.customers[i].id)
-                    {
-                        case 1:
-                            return GetPositionInMap(state.board, Tile.CUSTOMER_1);
-                        case 2:
-                            return GetPositionInMap(state.board, Tile.CUSTOMER_2);
-                        case 3:
-                            return GetPositionInMap(state.board, Tile.CUSTOMER_3);
-                        case 4:
-                            return GetPositionInMap(state.board, Tile.CUSTOMER_4);
-                    }
+                    return GetTilePosOnMap.GetClosestTile(state.board, state.myHero.pos, new List<Tile>() { _customers[state.customers[i].id - 1] });
                 }
             }
             return customerPosition;
@@ -39,64 +58,58 @@ namespace Coveo.Bot
 
         public override string Move(GameState state)
         {
-            if (!_needFirstFind)
+            int burgerRequirements = 0;
+            int fryRequirements = 0;
+            state.customers.ForEach(c => {
+                burgerRequirements += c.burger;
+                fryRequirements += c.frenchFries;
+            });
+
+            List<Tile> _tilesToSearch = new List<Tile>();
+
+
+            if (burgerRequirements != 0)
             {
-                if (_lastBurgerCount != state.myHero.burgerCount ||
-                    _lastFriesCount != state.myHero.frenchFriesCount)
+                _tilesToSearch.AddRange(_burgerTiles[state.myHero.id - 1]);
+            }
+
+            if (fryRequirements != 0)
+            {
+                _tilesToSearch.AddRange(_fryTiles[state.myHero.id - 1]);
+            }
+
+
+            if (_target == null)
+            {
+                _target = GetTilePosOnMap.GetClosestTile(state.board, state.myHero.pos, _tilesToSearch);
+            }
+            else if (_lastBurgerCount != state.myHero.burgerCount || _lastFriesCount != state.myHero.frenchFriesCount)
+            {
+                Pos position = TryCompleteCommand(state);
+                if (position != null)
                 {
-                    Pos position = TryCompleteCommand(state);
-                    if (position.x != -1 && position.y != -1)
-                    {
-                        _target = GetTilePosOnMap.GetClosestTile(state.board, state.myHero.pos,
-                            new[]
-                            {
-                                Tile.BURGER_1, Tile.BURGER_2, Tile.BURGER_3, Tile.BURGER_4, Tile.FRIES_1, Tile.FRIES_2,
-                                Tile.FRIES_3, Tile.FRIES_4
-                            });
-                    }
-                    else
-                    {
-                        _target = position;
-                    }
+                    _target = position;
+                }
+                else
+                {
+                    _target = GetTilePosOnMap.GetClosestTile(state.board, state.myHero.pos, _tilesToSearch);
                 }
             }
-            else
-            {
-                _target = GetTilePosOnMap.GetClosestTile(state.board, state.myHero.pos,
-                    new[] { Tile.BURGER_1, Tile.BURGER_2, Tile.BURGER_3, Tile.BURGER_4, Tile.FRIES_1, Tile.FRIES_2, Tile.FRIES_3, Tile.FRIES_4 });
-                _needFirstFind = false;
-            }
+
+            _lastBurgerCount = state.myHero.burgerCount;
+            _lastFriesCount = state.myHero.frenchFriesCount;
+
             return api.GetDirection(state.myHero.pos, _target);
         }
 
         public override void Setup()
         {
-            _target = new Pos() {x = 0, y = 0 };
-            _registeredCustomer = new Pos() {x = 0, y = 0};
-            _needFirstFind = true;
+            Console.WriteLine("Game Started.");
         }
 
         public override void Shutdown()
         {
-            _target = null;
-            _registeredCustomer = null;
-        }
-
-        private Pos GetPositionInMap(Tile[][] map, Tile tile) 
-        {
-            Pos pos = new Pos() {x = -1, y = -1};
-            for (int i = 0; i < map.Length; i++) 
-            {
-                for (int j = 0; j < map[i].Length; j++)
-                {
-                    if (map[j][i] == tile) {
-                        pos.x = j;
-                        pos.y = i;
-                        return pos;
-                    }
-                }
-            }
-            return pos;
+            Console.WriteLine("Game Over.");
         }
     }
 }

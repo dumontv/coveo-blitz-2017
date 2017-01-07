@@ -8,21 +8,20 @@ namespace Coveo.Bot
     {
         private static List<Pos> _targets = new List<Pos>();
 
-        public static Pos GetClosestTile(Tile[][] board, Pos startingPos, Tile[] type)
+        public static Pos GetClosestTile(Tile[][] board, Pos startingPos, List<Tile> types)
         {
             _targets.Clear();
 
-            for (int x = 0; x < board.Length; ++x)
+            for (int i = 0; i < board.Length; ++i)
             {
-                for (int y = 0; y < board[x].Length; ++y)
+                for (int j = 0; j < board[i].Length; ++j)
                 {
-                    foreach (Tile tile in type)
-                    {
-                        if (board[x][y] == tile)
+                    types.ForEach(t => {
+                        if (board[i][j] == t)
                         {
-                            _targets.Add(new Pos() { x = y, y = x });
+                            _targets.Add(new Pos() { x = j, y = i });
                         }
-                    }
+                    });
                 }
             }
             
@@ -37,7 +36,8 @@ namespace Coveo.Bot
 
             foreach (Pos tile in _targets)
             {
-                int distance = Math.Abs((tile.x - startingPos.x) * (tile.x - startingPos.x)) + ((tile.y - startingPos.y) * (tile.y - startingPos.y));
+                int distance = DistanceBetweenPos(startingPos, tile);
+                //Math.Abs((tile.x - startingPos.x) * (tile.x - startingPos.x)) + ((tile.y - startingPos.y) * (tile.y - startingPos.y));
                 if (distance < currDistance)
                 {
                     currDistance = distance;
@@ -46,6 +46,11 @@ namespace Coveo.Bot
             }
 
             return closestTile;
+        }
+
+        public static int DistanceBetweenPos(Pos start, Pos destination)
+        {
+            return Math.Abs((destination.x - start.x) * (destination.x - start.x)) + ((destination.y - start.y) * (destination.y - start.y));
         }
     }
 }
