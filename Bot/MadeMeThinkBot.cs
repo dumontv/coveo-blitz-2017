@@ -14,7 +14,7 @@ namespace Coveo.Bot
 
         private int _currentCustomerId;
 
-        public string Move(GameState state)
+        public override string Move(GameState state)
         {
             if (_botState.GetType() == typeof(ChasingState)) 
             {
@@ -97,13 +97,13 @@ namespace Coveo.Bot
             return _botState.Act(state);   
         }
 
-        public void Setup()
+        public override void Setup()
         {
             //RETOURNER LE PLUS PROCHE CUSTOMER
             _botState = new ChasingState(Tile.CUSTOMER_1);
         }
 
-        public void Shutdown()
+        public override void Shutdown()
         {
             throw new NotImplementedException();
         }
