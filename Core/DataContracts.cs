@@ -89,6 +89,11 @@ namespace CoveoBlitz
 
         [DataMember]
         public int y;
+
+        public override string ToString()
+        {
+            return "(" + this.x + "," + this.y + ")";
+        }
     }
 
     [DataContract]
@@ -112,5 +117,12 @@ namespace CoveoBlitz
         public int frenchFries;
         [DataMember]
         public int fulfilledOrders;
+    }
+
+    [DataContract]
+    public class DirectionResponse
+    {
+        [DataMember]
+        public string direction;
     }
 }
