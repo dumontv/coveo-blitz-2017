@@ -8,7 +8,7 @@ namespace Coveo.Bot
     {
         private static List<Pos> _targets = new List<Pos>();
 
-        public static Pos GetClosestTile(Tile[][] board, Pos startingPos, List<Tile> types)
+        public static Pos GetClosestTile(Tile[][] board, Pos startingPos, Tile[] types)
         {
             _targets = new List<Pos>();
 
@@ -16,12 +16,13 @@ namespace Coveo.Bot
             {
                 for (int j = 0; j < board[i].Length; ++j)
                 {
-                    types.ForEach(t => {
+                    foreach (Tile t in types)
+                    {
                         if (board[i][j] == t)
                         {
                             _targets.Add(new Pos() { x = j, y = i });
                         }
-                    });
+                    }
                 }
             }
             

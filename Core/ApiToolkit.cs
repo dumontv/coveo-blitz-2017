@@ -54,7 +54,7 @@ namespace CoveoBlitz
             string URL = string.Format("http://game.blitz.codes:8081/pathfinding/direction?map={0}&size={1}&start={2}&target={3}", this.map, this.Game.board.size, start.ToString(), target.ToString());
             WebRequest client = WebRequest.CreateHttp(URL);
             client.Method = "GET";
-            client.Timeout = 700; // Because we don't want to timeout
+            client.Timeout = 800; // Because we don't want to timeout
 
             try
             {
@@ -65,7 +65,7 @@ namespace CoveoBlitz
             {
                 if (exception.Status == WebExceptionStatus.Timeout)
                 {
-                    Console.WriteLine("Pathfinding took longer than 700 ms, selecting last direction.");
+                    Console.WriteLine("Pathfinding took longer than 800 ms, selecting last direction.");
                     return MadeMeThinkBot.LastDir;
                 }
 

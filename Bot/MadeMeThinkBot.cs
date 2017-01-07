@@ -11,25 +11,25 @@ namespace Coveo.Bot
         private int _lastBurgerCount = 0;
         private int _lastFriesCount = 0;
 
-        private static List<Tile>[] _allTiles = new List<Tile>[] {
-            new List<Tile>() { Tile.BURGER_2, Tile.FRIES_2, Tile.BURGER_3, Tile.FRIES_3, Tile.BURGER_4, Tile.FRIES_4, Tile.BURGER_NEUTRAL, Tile.FRIES_NEUTRAL },
-            new List<Tile>() { Tile.BURGER_1, Tile.FRIES_1, Tile.BURGER_3, Tile.FRIES_3, Tile.BURGER_4, Tile.FRIES_4, Tile.BURGER_NEUTRAL, Tile.FRIES_NEUTRAL },
-            new List<Tile>() { Tile.BURGER_1, Tile.FRIES_1, Tile.BURGER_2, Tile.FRIES_2, Tile.BURGER_4, Tile.FRIES_4, Tile.BURGER_NEUTRAL, Tile.FRIES_NEUTRAL },
-            new List<Tile>() { Tile.BURGER_1, Tile.FRIES_1, Tile.BURGER_2, Tile.FRIES_2, Tile.BURGER_3, Tile.FRIES_3, Tile.BURGER_NEUTRAL, Tile.FRIES_NEUTRAL }
+        private static Tile[][] _allTiles = new Tile[][] {
+            new Tile[] { Tile.BURGER_2, Tile.FRIES_2, Tile.BURGER_3, Tile.FRIES_3, Tile.BURGER_4, Tile.FRIES_4, Tile.BURGER_NEUTRAL, Tile.FRIES_NEUTRAL },
+            new Tile[] { Tile.BURGER_1, Tile.FRIES_1, Tile.BURGER_3, Tile.FRIES_3, Tile.BURGER_4, Tile.FRIES_4, Tile.BURGER_NEUTRAL, Tile.FRIES_NEUTRAL },
+            new Tile[] { Tile.BURGER_1, Tile.FRIES_1, Tile.BURGER_2, Tile.FRIES_2, Tile.BURGER_4, Tile.FRIES_4, Tile.BURGER_NEUTRAL, Tile.FRIES_NEUTRAL },
+            new Tile[] { Tile.BURGER_1, Tile.FRIES_1, Tile.BURGER_2, Tile.FRIES_2, Tile.BURGER_3, Tile.FRIES_3, Tile.BURGER_NEUTRAL, Tile.FRIES_NEUTRAL }
         };
 
-        private static List<Tile>[] _burgerTiles = new List<Tile>[] {
-            new List<Tile>() { Tile.BURGER_2, Tile.BURGER_3, Tile.BURGER_4, Tile.BURGER_NEUTRAL },
-            new List<Tile>() { Tile.BURGER_1, Tile.BURGER_3, Tile.BURGER_4, Tile.BURGER_NEUTRAL },
-            new List<Tile>() { Tile.BURGER_1, Tile.BURGER_2, Tile.BURGER_4, Tile.BURGER_NEUTRAL },
-            new List<Tile>() { Tile.BURGER_1, Tile.BURGER_2, Tile.BURGER_3, Tile.BURGER_NEUTRAL }
+        private static Tile[][] _burgerTiles = new Tile[][] {
+            new Tile[] { Tile.BURGER_2, Tile.BURGER_3, Tile.BURGER_4, Tile.BURGER_NEUTRAL },
+            new Tile[] { Tile.BURGER_1, Tile.BURGER_3, Tile.BURGER_4, Tile.BURGER_NEUTRAL },
+            new Tile[] { Tile.BURGER_1, Tile.BURGER_2, Tile.BURGER_4, Tile.BURGER_NEUTRAL },
+            new Tile[] { Tile.BURGER_1, Tile.BURGER_2, Tile.BURGER_3, Tile.BURGER_NEUTRAL }
         };
 
-        private static List<Tile>[] _fryTiles = new List<Tile>[] {
-            new List<Tile>() { Tile.FRIES_2, Tile.FRIES_3, Tile.FRIES_4, Tile.FRIES_NEUTRAL },
-            new List<Tile>() { Tile.FRIES_1, Tile.FRIES_3, Tile.FRIES_4, Tile.FRIES_NEUTRAL },
-            new List<Tile>() { Tile.FRIES_1, Tile.FRIES_2, Tile.FRIES_4, Tile.FRIES_NEUTRAL },
-            new List<Tile>() { Tile.FRIES_1, Tile.FRIES_2, Tile.FRIES_3, Tile.FRIES_NEUTRAL }
+        private static Tile[][] _fryTiles = new Tile[][] {
+            new Tile[] { Tile.FRIES_2, Tile.FRIES_3, Tile.FRIES_4, Tile.FRIES_NEUTRAL },
+            new Tile[] { Tile.FRIES_1, Tile.FRIES_3, Tile.FRIES_4, Tile.FRIES_NEUTRAL },
+            new Tile[] { Tile.FRIES_1, Tile.FRIES_2, Tile.FRIES_4, Tile.FRIES_NEUTRAL },
+            new Tile[] { Tile.FRIES_1, Tile.FRIES_2, Tile.FRIES_3, Tile.FRIES_NEUTRAL }
         };
 
         private static Tile[] _customers = new Tile[] {
@@ -39,22 +39,21 @@ namespace Coveo.Bot
             Tile.CUSTOMER_4
         };
 
-        private List<Tile> _tilesToSearch;
+        private Tile[] _tilesToSearch;
 
         public static string LastDir = Direction.Stay;
 
         private Pos TryCompleteCommand(GameState state)
         {
             Pos customerPosition = null;
-            //Console.WriteLine(state.customers.Count);
 
-            state.customers.Sort((Customer c1, Customer c2) => GetTilePosOnMap.DistanceBetweenPos(state.myHero.pos, GetTilePosOnMap.GetClosestTile(state.board, state.myHero.pos, new List<Tile>() { _customers[c1.id - 1] })).CompareTo(GetTilePosOnMap.DistanceBetweenPos(state.myHero.pos, GetTilePosOnMap.GetClosestTile(state.board, state.myHero.pos, new List<Tile>() { _customers[c2.id - 1] }))));
+            state.customers.Sort((Customer c1, Customer c2) => GetTilePosOnMap.DistanceBetweenPos(state.myHero.pos, GetTilePosOnMap.GetClosestTile(state.board, state.myHero.pos, new Tile[] { _customers[c1.id - 1] })).CompareTo(GetTilePosOnMap.DistanceBetweenPos(state.myHero.pos, GetTilePosOnMap.GetClosestTile(state.board, state.myHero.pos, new Tile[] { _customers[c2.id - 1] }))));
 
             for (int i = 0; i < state.customers.Count; ++i)
             {
                 if (state.customers[i].burger <= state.myHero.burgerCount && state.customers[i].frenchFries <= state.myHero.frenchFriesCount)
                 {
-                    return GetTilePosOnMap.GetClosestTile(state.board, state.myHero.pos, new List<Tile>() { _customers[state.customers[i].id - 1] });
+                    return GetTilePosOnMap.GetClosestTile(state.board, state.myHero.pos, new Tile[] { _customers[state.customers[i].id - 1] });
                 }
             }
             return customerPosition;
