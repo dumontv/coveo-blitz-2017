@@ -28,32 +28,32 @@ namespace CoveoBlitz.RandomBot
         /// <returns></returns>
         public override string Move(GameState state)
         {
+            
 
+            string direction = this.api.GetDirection(state.myHero.pos, new Pos() { x = 0, y = 0 });
 
-            string direction;
+            //switch (random.Next(0, 5))
+            //{
+            //    case 0:
+            //        direction = Direction.East;
+            //        break;
 
-            switch (random.Next(0, 5))
-            {
-                case 0:
-                    direction = Direction.East;
-                    break;
+            //    case 1:
+            //        direction = Direction.West;
+            //        break;
 
-                case 1:
-                    direction = Direction.West;
-                    break;
+            //    case 2:
+            //        direction = Direction.North;
+            //        break;
 
-                case 2:
-                    direction = Direction.North;
-                    break;
+            //    case 3:
+            //        direction = Direction.South;
+            //        break;
 
-                case 3:
-                    direction = Direction.South;
-                    break;
-
-                default:
-                    direction = Direction.Stay;
-                    break;
-            }
+            //    default:
+            //        direction = Direction.Stay;
+            //        break;
+            //}
 
             Console.WriteLine("Completed turn {0}, going {1}", state.currentTurn, direction);
             return direction;

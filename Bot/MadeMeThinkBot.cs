@@ -7,8 +7,11 @@ namespace Coveo.Bot
     {
         private StateMachine _botState;
 
+        private int _currentCustomerId;
+
         public override string Move(GameState state)
-		private int _currentCustomerId;        {
+        { 
+		
             Customer myCustomer = state.customers[_currentCustomerId];
             if (_botState.GetType() == typeof(ChasingState) && 
                 state.myHero.life <= 30) 
