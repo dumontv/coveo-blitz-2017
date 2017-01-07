@@ -1,11 +1,9 @@
-﻿namespace Coveo.Bot.MadeMeThinkBot
+﻿using CoveoBlitz;
+
+namespace Coveo.Bot
 {
     public abstract class StateMachine
     {
-        //Possible Chase States
-        // 1- Chasing
-        // 2- Delivering
-        // 3- Healing
-        protected abstract void Act();
+        protected abstract void Act(GameState currentState);
     }
 }

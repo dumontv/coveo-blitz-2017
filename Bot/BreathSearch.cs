@@ -2,7 +2,7 @@
 using Coveo;
 using CoveoBlitz;
 
-namespace Coveo.Bot.MadeMeThink
+namespace Coveo.Bot
 {
     public class BreathSearch
     {
