@@ -7,18 +7,18 @@ namespace Coveo.Bot
     {
         private StateMachine _botState;
 
-        public string Move(GameState state)
+        public override string Move(GameState state)
         {
             return _botState.Act(state);
             
         }
 
-        public void Setup()
+        public override void Setup()
         {
             throw new NotImplementedException();
         }
 
-        public void Shutdown()
+        public override void Shutdown()
         {
             throw new NotImplementedException();
         }

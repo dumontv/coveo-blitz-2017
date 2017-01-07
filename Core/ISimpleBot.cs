@@ -1,11 +1,13 @@
 namespace CoveoBlitz
 {
-    public interface ISimpleBot
+    public abstract class ISimpleBot
     {
-        void Setup();
+        public ApiToolkit api { get; set; }
 
-        void Shutdown();
+        public abstract void Setup();
 
-        string Move(GameState state);
+        public abstract void Shutdown();
+
+        public abstract string Move(GameState state);
     }
 }

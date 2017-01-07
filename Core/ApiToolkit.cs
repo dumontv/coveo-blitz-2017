@@ -17,6 +17,9 @@ namespace CoveoBlitz
         private readonly string uri;
         private readonly string serverURL;
 
+        public string map { get; private set; }
+        public Game Game { get; private set; }
+
         public string playURL { get; private set; }
         public string viewURL { get; private set; }
         public string botKey { get; private set; }
@@ -31,6 +34,7 @@ namespace CoveoBlitz
             uint turns = 25,
             string map = null)
         {
+            this.map = map;
             this.botKey = key;
             this.uri = serverURL + (trainingMode ? TRAINING_URL : ARENA_URL);
             this.uri += "?key=" + key;
@@ -44,6 +48,61 @@ namespace CoveoBlitz
             }
 
             errored = false;
+        }
+
+        public string GetDirection(Pos start, Pos target)
+        {
+            WebRequest client = WebRequest.CreateHttp("http://game.blitz.codes:8081/pathfinding/direction?map=" + this.map + "&size=" + this.Game.board.size + 
+                "&start=" + start.ToString() + "&target=" + target.ToString());
+            client.Method = "GET";
+            client.Timeout = 1000 * 60 * 60; // Because we don't want to timeout
+
+            try
+            {
+                string result = new StreamReader(client.GetResponse().GetResponseStream()).ReadToEnd();
+                return DeserializeDirection(result);
+            }
+            catch (WebException exception)
+            {
+                Console.WriteLine(exception.Message);
+                if (exception.Response != null)
+                {
+                    using (var reader = new StreamReader(exception.Response.GetResponseStream()))
+                    {
+                        errored = true;
+                        Console.WriteLine(reader.ReadToEnd());
+                    }
+                }
+
+                Random random = new Random();
+                string direction;
+
+                switch (random.Next(0, 5))
+                {
+                    case 0:
+                        direction = Direction.East;
+                        break;
+
+                    case 1:
+                        direction = Direction.West;
+                        break;
+
+                    case 2:
+                        direction = Direction.North;
+                        break;
+
+                    case 3:
+                        direction = Direction.South;
+                        break;
+
+                    default:
+                        direction = Direction.Stay;
+                        break;
+                }
+
+                Console.WriteLine("ERROR GOING RANDOM");
+                return direction;
+            }
         }
 
         //initializes a new game, its syncronised
@@ -75,6 +134,7 @@ namespace CoveoBlitz
 
             DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(GameResponse));
             GameResponse gameResponse = (GameResponse) ser.ReadObject(stream);
+            this.Game = gameResponse.game;
 
             playURL = gameResponse.playUrl;
             viewURL = gameResponse.viewUrl;
@@ -88,6 +148,16 @@ namespace CoveoBlitz
                 board = createBoard(gameResponse.game.board.size, gameResponse.game.board.tiles),
                 customers = gameResponse.game.customers
             };
+        }
+
+        private string DeserializeDirection(string json)
+        {
+            byte[] byteArray = Encoding.UTF8.GetBytes(json);
+            MemoryStream stream = new MemoryStream(byteArray);
+
+            DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(DirectionResponse));
+            DirectionResponse directionResponse = (DirectionResponse)ser.ReadObject(stream);
+            return directionResponse.direction;
         }
 
         public void MoveHero(string direction)

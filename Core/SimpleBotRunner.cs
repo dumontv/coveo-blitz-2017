@@ -37,6 +37,7 @@ namespace CoveoBlitz
         {
             // Bot's setup
             simpleBot.Setup();
+            simpleBot.api = api;
 
             // Connecting to the game
             api.CreateGame();

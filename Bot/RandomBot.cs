@@ -16,7 +16,7 @@ namespace CoveoBlitz.RandomBot
         /// <summary>
         /// This will be run before the game starts
         /// </summary>
-        public void Setup()
+        public override void Setup()
         {
             Console.WriteLine("Coveo's C# RandomBot");
         }
@@ -26,7 +26,7 @@ namespace CoveoBlitz.RandomBot
         /// </summary>
         /// <param name="state">The game state</param>
         /// <returns></returns>
-        public string Move(GameState state)
+        public override string Move(GameState state)
         {
 
 
@@ -62,7 +62,7 @@ namespace CoveoBlitz.RandomBot
         /// <summary>
         /// This is run after the game.
         /// </summary>
-        public void Shutdown()
+        public override void Shutdown()
         {
             Console.WriteLine("Done");
         }
