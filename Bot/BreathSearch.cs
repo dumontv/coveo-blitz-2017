@@ -2,18 +2,24 @@
 using Coveo;
 using CoveoBlitz;
 
-namespace Coveo.Bot.MadeMeThink
+namespace Coveo.Bot
 {
     public class BreathSearch
     {
-        private int xOffSet = 1;
-        private int yOffSet = 0;
+        private static int xOffSet = 1;
+        private static int yOffSet = 0;
 
-        private int currentSqrLength = 1;
+        private static int currentSqrLength = 1;
 
-        static public Direction GetNextMovementForTile(Tile[][] board, Point current, Tile type)
+        static public string GetNextMovementForTile(Tile[][] board, Point currentPos, Tile type)
         {
-               
+            InitialiseSearch(currentPos);
+            return Direction.Stay;
+        }
+
+        private static void InitialiseSearch(Point currentPos)
+        {
+            //currenPos = new Point(currentPos.X + xOff)
         }
     }
 }
