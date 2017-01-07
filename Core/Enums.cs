@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 
 namespace CoveoBlitz
 {
@@ -35,5 +36,37 @@ namespace CoveoBlitz
         public const string East = "East";
         public const string South = "South";
         public const string West = "West";
+
+        private static Random random = new Random();
+
+        public static string GetRandom()
+        {
+            string direction;
+
+            switch (random.Next(0, 5))
+            {
+                case 0:
+                    direction = East;
+                    break;
+
+                case 1:
+                    direction = West;
+                    break;
+
+                case 2:
+                    direction = North;
+                    break;
+
+                case 3:
+                    direction = South;
+                    break;
+
+                default:
+                    direction = Stay;
+                    break;
+            }
+
+            return direction;
+        }
     }
 }

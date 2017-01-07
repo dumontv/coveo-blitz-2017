@@ -15,7 +15,6 @@ namespace CoveoBlitz
         public const string ARENA_URL = "/api/arena";
 
         private readonly string uri;
-        private readonly string serverURL;
 
         public string map { get; private set; }
         public Game Game { get; private set; }
@@ -51,11 +50,11 @@ namespace CoveoBlitz
 
         public string GetDirection(Pos start, Pos target)
         {
-            string URL = "http://game.blitz.codes:8081/pathfinding/direction?map=" + this.map + "&size=" + this.Game.board.size + "&start=" + start.ToString() + "&target=" + target.ToString();
-            Console.WriteLine(URL);
+            string URL = string.Format("http://game.blitz.codes:8081/pathfinding/direction?map={0}&size={1}&start={2}&target={3}", this.map, this.Game.board.size, start.ToString(), target.ToString());
+            Console.WriteLine("Getting Path with URL {0}", URL);
             WebRequest client = WebRequest.CreateHttp(URL);
             client.Method = "GET";
-            client.Timeout = 1000 * 60 * 60; // Because we don't want to timeout
+            client.Timeout = 900; // Because we don't want to timeout
 
             try
             {
@@ -64,45 +63,34 @@ namespace CoveoBlitz
             }
             catch (WebException exception)
             {
+                if (exception.Status == WebExceptionStatus.Timeout)
+                {
+                    Console.WriteLine("Pathfinding took longer than 900 ms, selecting random direction.");
+                    return Direction.GetRandom();
+                }
+
                 Console.WriteLine(exception.Message);
                 if (exception.Response != null)
                 {
                     using (var reader = new StreamReader(exception.Response.GetResponseStream()))
                     {
-                        errored = true;
                         Console.WriteLine(reader.ReadToEnd());
                     }
-                }
+                }                
 
-                Random random = new Random();
-                string direction;
-
-                switch (random.Next(0, 5))
-                {
-                    case 0:
-                        direction = Direction.East;
-                        break;
-
-                    case 1:
-                        direction = Direction.West;
-                        break;
-
-                    case 2:
-                        direction = Direction.North;
-                        break;
-
-                    case 3:
-                        direction = Direction.South;
-                        break;
-
-                    default:
-                        direction = Direction.Stay;
-                        break;
-                }
-
-                Console.WriteLine("ERROR GOING RANDOM");
-                return direction;
+                Console.WriteLine("Server Error, staying.");
+                return Direction.Stay;
             }
+        }
+
+        private static string DeserializeDirection(string json)
+        {
+            byte[] byteArray = Encoding.UTF8.GetBytes(json);
+            MemoryStream stream = new MemoryStream(byteArray);
+
+            DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(DirectionResponse));
+            DirectionResponse directionResponse = (DirectionResponse)ser.ReadObject(stream);
+            return directionResponse.direction;
         }
 
         //initializes a new game, its syncronised
@@ -136,8 +124,8 @@ namespace CoveoBlitz
             GameResponse gameResponse = (GameResponse) ser.ReadObject(stream);
             this.Game = gameResponse.game;
 
-            playURL = gameResponse.playUrl;
-            viewURL = gameResponse.viewUrl;
+            this.playURL = gameResponse.playUrl;
+            this.viewURL = gameResponse.viewUrl;
 
             return new GameState() {
                 myHero = gameResponse.hero,
@@ -150,19 +138,9 @@ namespace CoveoBlitz
             };
         }
 
-        private string DeserializeDirection(string json)
-        {
-            byte[] byteArray = Encoding.UTF8.GetBytes(json);
-            MemoryStream stream = new MemoryStream(byteArray);
-
-            DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(DirectionResponse));
-            DirectionResponse directionResponse = (DirectionResponse)ser.ReadObject(stream);
-            return directionResponse.direction;
-        }
-
         public void MoveHero(string direction)
         {
-            Console.WriteLine("Going {0}", direction);
+            Console.WriteLine("Going {0}\n", direction);
             string myParameters = "key=" + botKey + "&dir=" + direction;
 
             using (WebClient client = new WebClient()) {
