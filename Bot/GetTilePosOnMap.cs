@@ -10,7 +10,7 @@ namespace Coveo.Bot
 
         public static Pos GetClosestTile(Tile[][] board, Pos startingPos, List<Tile> types)
         {
-            _targets.Clear();
+            _targets = new List<Pos>();
 
             for (int i = 0; i < board.Length; ++i)
             {
@@ -37,7 +37,6 @@ namespace Coveo.Bot
             foreach (Pos tile in _targets)
             {
                 int distance = DistanceBetweenPos(startingPos, tile);
-                //Math.Abs((tile.x - startingPos.x) * (tile.x - startingPos.x)) + ((tile.y - startingPos.y) * (tile.y - startingPos.y));
                 if (distance < currDistance)
                 {
                     currDistance = distance;

@@ -2,7 +2,6 @@
 
 using Coveo.Bot;
 using CoveoBlitz;
-using CoveoBlitz.RandomBot;
 using System;
 
 namespace Coveo

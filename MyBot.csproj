@@ -57,7 +57,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Bot\*" />
+    <Compile Include="Bot\BreathSearch.cs" />
+    <Compile Include="Bot\GetTilePosOnMap.cs" />
+    <Compile Include="Bot\MadeMeThinkBot.cs" />
+    <Compile Include="Bot\Point.cs" />
     <Compile Include="Core\DataContracts.cs" />
     <Compile Include="Core\Enums.cs" />
     <Compile Include="Program.cs" />

@@ -11,25 +11,25 @@ namespace Coveo.Bot
         private int _lastBurgerCount = 0;
         private int _lastFriesCount = 0;
 
-        private static Tile[][] _tiles = new Tile[][] {
-            new Tile[] { Tile.BURGER_2, Tile.FRIES_2, Tile.BURGER_3, Tile.FRIES_3, Tile.BURGER_4, Tile.FRIES_4, Tile.BURGER_NEUTRAL, Tile.FRIES_NEUTRAL },
-            new Tile[] { Tile.BURGER_1, Tile.FRIES_1, Tile.BURGER_3, Tile.FRIES_3, Tile.BURGER_4, Tile.FRIES_4, Tile.BURGER_NEUTRAL, Tile.FRIES_NEUTRAL },
-            new Tile[] { Tile.BURGER_1, Tile.FRIES_1, Tile.BURGER_2, Tile.FRIES_2, Tile.BURGER_4, Tile.FRIES_4, Tile.BURGER_NEUTRAL, Tile.FRIES_NEUTRAL },
-            new Tile[] { Tile.BURGER_1, Tile.FRIES_1, Tile.BURGER_2, Tile.FRIES_2, Tile.BURGER_3, Tile.FRIES_3, Tile.BURGER_NEUTRAL, Tile.FRIES_NEUTRAL }
+        private static List<Tile>[] _allTiles = new List<Tile>[] {
+            new List<Tile>() { Tile.BURGER_2, Tile.FRIES_2, Tile.BURGER_3, Tile.FRIES_3, Tile.BURGER_4, Tile.FRIES_4, Tile.BURGER_NEUTRAL, Tile.FRIES_NEUTRAL },
+            new List<Tile>() { Tile.BURGER_1, Tile.FRIES_1, Tile.BURGER_3, Tile.FRIES_3, Tile.BURGER_4, Tile.FRIES_4, Tile.BURGER_NEUTRAL, Tile.FRIES_NEUTRAL },
+            new List<Tile>() { Tile.BURGER_1, Tile.FRIES_1, Tile.BURGER_2, Tile.FRIES_2, Tile.BURGER_4, Tile.FRIES_4, Tile.BURGER_NEUTRAL, Tile.FRIES_NEUTRAL },
+            new List<Tile>() { Tile.BURGER_1, Tile.FRIES_1, Tile.BURGER_2, Tile.FRIES_2, Tile.BURGER_3, Tile.FRIES_3, Tile.BURGER_NEUTRAL, Tile.FRIES_NEUTRAL }
         };
 
-        private static Tile[][] _burgerTiles = new Tile[][] {
-            new Tile[] { Tile.BURGER_2, Tile.BURGER_3, Tile.BURGER_4, Tile.BURGER_NEUTRAL },
-            new Tile[] { Tile.BURGER_1, Tile.BURGER_3, Tile.BURGER_4, Tile.BURGER_NEUTRAL },
-            new Tile[] { Tile.BURGER_1, Tile.BURGER_2, Tile.BURGER_4, Tile.BURGER_NEUTRAL },
-            new Tile[] { Tile.BURGER_1, Tile.BURGER_2, Tile.BURGER_3, Tile.BURGER_NEUTRAL }
+        private static List<Tile>[] _burgerTiles = new List<Tile>[] {
+            new List<Tile>() { Tile.BURGER_2, Tile.BURGER_3, Tile.BURGER_4, Tile.BURGER_NEUTRAL },
+            new List<Tile>() { Tile.BURGER_1, Tile.BURGER_3, Tile.BURGER_4, Tile.BURGER_NEUTRAL },
+            new List<Tile>() { Tile.BURGER_1, Tile.BURGER_2, Tile.BURGER_4, Tile.BURGER_NEUTRAL },
+            new List<Tile>() { Tile.BURGER_1, Tile.BURGER_2, Tile.BURGER_3, Tile.BURGER_NEUTRAL }
         };
 
-        private static Tile[][] _fryTiles = new Tile[][] {
-            new Tile[] { Tile.FRIES_2, Tile.FRIES_3, Tile.FRIES_4, Tile.FRIES_NEUTRAL },
-            new Tile[] { Tile.FRIES_1, Tile.FRIES_3, Tile.FRIES_4, Tile.FRIES_NEUTRAL },
-            new Tile[] { Tile.FRIES_1, Tile.FRIES_2, Tile.FRIES_4, Tile.FRIES_NEUTRAL },
-            new Tile[] { Tile.FRIES_1, Tile.FRIES_2, Tile.FRIES_3, Tile.FRIES_NEUTRAL }
+        private static List<Tile>[] _fryTiles = new List<Tile>[] {
+            new List<Tile>() { Tile.FRIES_2, Tile.FRIES_3, Tile.FRIES_4, Tile.FRIES_NEUTRAL },
+            new List<Tile>() { Tile.FRIES_1, Tile.FRIES_3, Tile.FRIES_4, Tile.FRIES_NEUTRAL },
+            new List<Tile>() { Tile.FRIES_1, Tile.FRIES_2, Tile.FRIES_4, Tile.FRIES_NEUTRAL },
+            new List<Tile>() { Tile.FRIES_1, Tile.FRIES_2, Tile.FRIES_3, Tile.FRIES_NEUTRAL }
         };
 
         private static Tile[] _customers = new Tile[] {
@@ -38,6 +38,10 @@ namespace Coveo.Bot
             Tile.CUSTOMER_3,
             Tile.CUSTOMER_4
         };
+
+        private List<Tile> _tilesToSearch;
+
+        public static string LastDir = Direction.Stay;
 
         private Pos TryCompleteCommand(GameState state)
         {
@@ -63,19 +67,19 @@ namespace Coveo.Bot
             state.customers.ForEach(c => {
                 burgerRequirements += c.burger;
                 fryRequirements += c.frenchFries;
-            });
+            });            
 
-            List<Tile> _tilesToSearch = new List<Tile>();
-
-
-            if (burgerRequirements != 0)
+            if (burgerRequirements == 0 && fryRequirements != 0)
             {
-                _tilesToSearch.AddRange(_burgerTiles[state.myHero.id - 1]);
+                _tilesToSearch = _burgerTiles[state.myHero.id - 1];
             }
-
-            if (fryRequirements != 0)
+            else if (fryRequirements == 0 && burgerRequirements != 0)
             {
-                _tilesToSearch.AddRange(_fryTiles[state.myHero.id - 1]);
+                _tilesToSearch = _fryTiles[state.myHero.id - 1];
+            }
+            else
+            {
+                _tilesToSearch = _allTiles[state.myHero.id - 1];
             }
 
 
@@ -99,7 +103,8 @@ namespace Coveo.Bot
             _lastBurgerCount = state.myHero.burgerCount;
             _lastFriesCount = state.myHero.frenchFriesCount;
 
-            return api.GetDirection(state.myHero.pos, _target);
+            LastDir = api.GetDirection(state.myHero.pos, _target);
+            return LastDir;
         }
 
         public override void Setup()
