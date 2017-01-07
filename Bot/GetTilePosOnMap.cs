@@ -6,9 +6,9 @@ namespace Coveo.Bot
 {
     public class GetTilePosOnMap
     {
-        private List<Pos> _targets = new List<Pos>();
+        private static List<Pos> _targets = new List<Pos>();
 
-        public Pos GetClosestTile(Tile[][] board, Pos startingPos, Tile[] type)
+        public static Pos GetClosestTile(Tile[][] board, Pos startingPos, Tile[] type)
         {
             _targets.Clear();
 
@@ -29,11 +29,10 @@ namespace Coveo.Bot
             return FindClosestTilePos(startingPos);
         }
 
-        private Pos FindClosestTilePos(Pos startingPos)
+        private static Pos FindClosestTilePos(Pos startingPos)
         {
             int currDistance = int.MaxValue;
             Pos closestTile = new Pos() { x = 0, y = 0 };
-            Console.WriteLine("aa");
 
 
             foreach (Pos tile in _targets)

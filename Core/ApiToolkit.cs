@@ -51,7 +51,6 @@ namespace CoveoBlitz
         public string GetDirection(Pos start, Pos target)
         {
             string URL = string.Format("http://game.blitz.codes:8081/pathfinding/direction?map={0}&size={1}&start={2}&target={3}", this.map, this.Game.board.size, start.ToString(), target.ToString());
-            Console.WriteLine("Getting Path with URL {0}", URL);
             WebRequest client = WebRequest.CreateHttp(URL);
             client.Method = "GET";
             client.Timeout = 900; // Because we don't want to timeout
