@@ -27,7 +27,7 @@ namespace Coveo
             string gameId = args.Length == 3 ? args[2] : null;
 
             SimpleBotRunner runner = new SimpleBotRunner(
-                new ApiToolkit(serverURL, args[0], args[1] == "training", gameId),
+                new ApiToolkit(serverURL, args[0], args[1] == "training", gameId, 300, "m1"),
                 new RandomBot());
 
             runner.Run();

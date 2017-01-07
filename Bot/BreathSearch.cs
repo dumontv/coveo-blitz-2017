@@ -4,19 +4,19 @@ using CoveoBlitz;
 
 namespace Coveo.Bot
 { 
-    public class BreathSearch
+    public static class BreathSearch
     {
         private static int xOffSet = 1;
         private static int yOffSet = 0;
 
         private static int _currentSqrDiam = 0;
 
-        private static Point _currentPos;
-        private static Point _startingPos;
+        private static Pos _currentPos;
+        private static Pos _startingPos;
         private static string direction = Direction.South;
-        private static Point _layerStart;
+        private static Pos _layerStart;
 
-        public static Point GetNextMovementForTile(Tile[][] board, Point startingPos, Tile type)
+        public static Pos GetNextMovementForTile(Tile[][] board, Pos startingPos, Tile type)
         {
             _startingPos = startingPos;
             AddSquareLayer(startingPos);
@@ -28,15 +28,15 @@ namespace Coveo.Bot
                     break;
                 }
 
-                if (_currentPos.Y + 1 == _layerStart.Y)
+                if (_currentPos.y + 1 == _layerStart.x)
                 {
                     AddSquareLayer(_currentPos);
                 }
 
-                if (_currentPos.X >= _startingPos.X + _currentSqrDiam && direction == Direction.East ||
-                    _currentPos.Y >= _startingPos.Y + _currentSqrDiam && direction == Direction.South ||
-                    _currentPos.X <= _startingPos.X - _currentSqrDiam && direction == Direction.West ||
-                    _currentPos.Y <= _startingPos.Y - _currentSqrDiam && direction == Direction.North)
+                if (_currentPos.x >= _startingPos.x + _currentSqrDiam && direction == Direction.East ||
+                    _currentPos.y >= _startingPos.y + _currentSqrDiam && direction == Direction.South ||
+                    _currentPos.x <= _startingPos.x - _currentSqrDiam && direction == Direction.West ||
+                    _currentPos.y <= _startingPos.y - _currentSqrDiam && direction == Direction.North)
                 {
                     CycleDirection();
                 }
@@ -52,29 +52,29 @@ namespace Coveo.Bot
             switch (direction)
             {
                 case Direction.East:
-                    _currentPos = new Point(_currentPos.X + 1, _currentPos.Y);
-                    if (board[_currentPos.X][_currentPos.Y] == type)
+                    _currentPos = new Pos { x = _currentPos.x + 1, y = _currentPos.y };
+                    if (board[_currentPos.x][_currentPos.y] == type)
                     {
                         return true;
                     }
                     break;
                 case Direction.South:
-                    _currentPos = new Point(_currentPos.X, _currentPos.Y + 1);
-                    if (board[_currentPos.X][_currentPos.Y] == type)
+                    _currentPos = new Pos { x = _currentPos.x, y = _currentPos.y + 1 };
+                    if (board[_currentPos.x][_currentPos.y] == type)
                     {
                         return true;
                     }
                     break;
                 case Direction.West:
-                    _currentPos = new Point(_currentPos.X - 1, _currentPos.Y);
-                    if (board[_currentPos.X][_currentPos.Y] == type)
+                    _currentPos = new Pos { x = _currentPos.x - 1, y = _currentPos.y };
+                    if (board[_currentPos.x][_currentPos.y] == type)
                     {
                         return true;
                     }
                     break;
                 case Direction.North:
-                    _currentPos = new Point(_currentPos.X, _currentPos.Y - 1);
-                    if (board[_currentPos.X][_currentPos.Y] == type)
+                    _currentPos = new Pos { x = _currentPos.x, y = _currentPos.y - 1 };
+                    if (board[_currentPos.x][_currentPos.y] == type)
                     {
                         return true;
                     }
@@ -83,10 +83,10 @@ namespace Coveo.Bot
             return false;
         }
 
-        private static void AddSquareLayer(Point currentPos)
+        private static void AddSquareLayer(Pos currentPos)
         {
             ++_currentSqrDiam;
-            _currentPos = new Point(currentPos.X + xOffSet, currentPos.Y + yOffSet);
+            _currentPos = new Pos { x = currentPos.x + xOffSet, y = currentPos.y + yOffSet };
             _layerStart = _currentPos;
         }
 
@@ -114,19 +114,19 @@ namespace Coveo.Bot
             switch (direction)
             {
                 case Direction.East:
-                    if (_currentPos.X + 1 > board.GetLength(0))
+                    if (_currentPos.x + 1 > board.GetLength(0))
                     return true;
                     break;
                 case Direction.South:
-                    if (_currentPos.Y + 1 > board.GetLength(1))
+                    if (_currentPos.y + 1 > board.GetLength(1))
                     return true;
                     break;
                 case Direction.West:
-                    if (_currentPos.X - 1 > board.GetLength(0))
+                    if (_currentPos.x - 1 > board.GetLength(0))
                     return true;
                     break;
                 case Direction.North:
-                    if (_currentPos.Y - 1 > board.GetLength(1))
+                    if (_currentPos.y - 1 > board.GetLength(1))
                     return true;
                     break;
             }

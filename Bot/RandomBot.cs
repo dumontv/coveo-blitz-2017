@@ -1,5 +1,6 @@
 ﻿// Copyright (c) 2005-2016, Coveo Solutions Inc.
 
+using Coveo.Bot;
 using System;
 
 namespace CoveoBlitz.RandomBot
@@ -30,7 +31,7 @@ namespace CoveoBlitz.RandomBot
         {
             
 
-            string direction = this.api.GetDirection(state.myHero.pos, new Pos() { x = 0, y = 0 });
+            string direction = this.api.GetDirection(state.myHero.pos, new Pos { x = 9, y = 9});
 
             //switch (random.Next(0, 5))
             //{

@@ -34,7 +34,6 @@ namespace CoveoBlitz
             uint turns = 25,
             string map = null)
         {
-            this.map = map;
             this.botKey = key;
             this.uri = serverURL + (trainingMode ? TRAINING_URL : ARENA_URL);
             this.uri += "?key=" + key;
@@ -52,8 +51,9 @@ namespace CoveoBlitz
 
         public string GetDirection(Pos start, Pos target)
         {
-            WebRequest client = WebRequest.CreateHttp("http://game.blitz.codes:8081/pathfinding/direction?map=" + this.map + "&size=" + this.Game.board.size + 
-                "&start=" + start.ToString() + "&target=" + target.ToString());
+            string URL = "http://game.blitz.codes:8081/pathfinding/direction?map=" + this.map + "&size=" + this.Game.board.size + "&start=" + start.ToString() + "&target=" + target.ToString();
+            Console.WriteLine(URL);
+            WebRequest client = WebRequest.CreateHttp(URL);
             client.Method = "GET";
             client.Timeout = 1000 * 60 * 60; // Because we don't want to timeout
 
@@ -183,6 +183,7 @@ namespace CoveoBlitz
         private Tile[][] createBoard(int size,
             string data)
         {
+            this.map = WebUtility.UrlEncode(data);
             Tile[][] board = new Tile[size][];
             for (int i = 0; i < size; i++) {
                 board[i] = new Tile[size];
@@ -299,6 +300,7 @@ namespace CoveoBlitz
                     y++;
                 }
             }
+            
             return board;
         }
     }
