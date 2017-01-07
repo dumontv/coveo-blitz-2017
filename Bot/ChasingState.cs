@@ -5,9 +5,8 @@ using CoveoBlitz;
 //When the player is grabbing the goods
 public class ChasingState : StateMachine
 {
-    public ChasingState()
+    public ChasingState(Tile target) : base(target)
     {
-
     }
 
     public override string Act(GameState gameState)
