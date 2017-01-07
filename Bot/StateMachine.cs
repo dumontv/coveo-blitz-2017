@@ -4,6 +4,6 @@ namespace Coveo.Bot
 {
     public abstract class StateMachine
     {
-        protected abstract void Act(GameState currentState);
+        public abstract string Act(GameState currentState);
     }
 }

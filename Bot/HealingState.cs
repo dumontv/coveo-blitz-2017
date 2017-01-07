@@ -10,7 +10,7 @@ public class HealingState : StateMachine
 
     }
 
-    protected override void Act(GameState gameState)
+    public override string Act(GameState gameState)
     {
         throw new NotImplementedException();
     }
